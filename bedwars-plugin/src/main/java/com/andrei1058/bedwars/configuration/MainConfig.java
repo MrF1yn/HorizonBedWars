@@ -57,6 +57,7 @@ public class MainConfig extends ConfigManager {
         yml.addDefault("globalChat", false);
         yml.addDefault("formatChat", true);
         yml.addDefault("debug", false);
+        yml.addDefault("auto-scale", false);
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MARK_LEAVE_AS_ABANDON, false);
         // parties category
         yml.addDefault(ConfigPath.GENERAL_ENABLE_PARTY_CMD, true);

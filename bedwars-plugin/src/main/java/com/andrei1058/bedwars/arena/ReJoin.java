@@ -98,6 +98,20 @@ public class ReJoin {
     }
 
     /**
+     * Check if a player has stored data
+     */
+    public static boolean exists(@NotNull UUID pl) {
+        BedWars.debug("ReJoin exists check " + pl);
+        for (ReJoin rj : getReJoinList()) {
+            BedWars.debug("ReJoin exists check list scroll: " + rj.getPl().toString());
+            if (rj.getPl().equals(pl)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get a player ReJoin
      */
     @Nullable

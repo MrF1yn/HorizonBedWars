@@ -106,7 +106,15 @@ public class Arena implements IArena {
     public static HashMap<UUID, Integer> afkCheck = new HashMap<>();
     public static HashMap<UUID, Integer> magicMilk = new HashMap<>();
 
+    public boolean isAllowMapBreak() {
+        return allowMapBreak;
+    }
 
+    public void setAllowMapBreak(boolean allowMapBreak) {
+        this.allowMapBreak = allowMapBreak;
+    }
+
+    private boolean allowMapBreak;
     private List<Player> players = new ArrayList<>();
     private List<Player> spectators = new ArrayList<>();
     private List<Block> signs = new ArrayList<>();
@@ -123,6 +131,7 @@ public class Arena implements IArena {
     private List<String> nextEvents = new ArrayList<>();
     private List<Region> regionsList = new ArrayList<>();
     private int renderDistance;
+    private boolean showInGUI = true;
 
     private final List<Player> leaving = new ArrayList<>();
 
@@ -179,6 +188,7 @@ public class Arena implements IArena {
     private ITeamAssigner teamAssigner = new TeamAssigner();
 
 
+
     /**
      * Load an arena.
      * This will check if it was set up right.
@@ -204,13 +214,16 @@ public class Arena implements IArena {
             }
         }
         this.arenaName = name;
-        if (autoscale) {
+        cm = new ArenaConfig(BedWars.plugin, name, plugin.getDataFolder().getPath() + "/Arenas");
+//        System.out.println(autoscale);
+//        System.out.println(getConfig().getBoolean("can-auto-scale"));
+        if (autoscale && getConfig().getBoolean("can-auto-scale")) {
             this.worldName = BedWars.arenaManager.generateGameID();
         } else {
             this.worldName = arenaName;
         }
 
-        cm = new ArenaConfig(BedWars.plugin, name, plugin.getDataFolder().getPath() + "/Arenas");
+
 
         //if (mapManager.isLevelWorld()) {
         //    Main.plugin.getLogger().severe("COULD NOT LOAD ARENA: " + name);
@@ -233,6 +246,7 @@ public class Arena implements IArena {
         minPlayers = yml.getInt("minPlayers");
         allowSpectate = yml.getBoolean("allowSpectate");
         islandRadius = yml.getInt(ConfigPath.ARENA_ISLAND_RADIUS);
+        allowMapBreak = yml.getBoolean(ConfigPath.ARENA_ALLOW_MAP_BREAK);
         if (config.getYml().get("arenaGroups") != null) {
             if (config.getYml().getStringList("arenaGroups").contains(yml.getString("group"))) {
                 group = yml.getString("group");
@@ -285,7 +299,8 @@ public class Arena implements IArena {
         Language.saveIfNotExists(Messages.ARENA_DISPLAY_GROUP_PATH + getGroup().toLowerCase(), String.valueOf(getGroup().charAt(0)).toUpperCase() + group.substring(1).toLowerCase());
     }
 
-    public Arena(String name, Player p, ArenaConfig arenaConfig, boolean bypassWorldCheck) {
+    public Arena(String name, Player p, ArenaConfig arenaConfig, boolean bypassWorldCheck, boolean showInGUI) {
+        this.showInGUI = showInGUI;
         if (!autoscale) {
             for (IArena mm : enableQueue) {
                 if (mm.getArenaName().equalsIgnoreCase(name)) {
@@ -303,13 +318,14 @@ public class Arena implements IArena {
             }
         }
         this.arenaName = name;
-        if (autoscale) {
+        cm = arenaConfig;
+        if (autoscale&&getConfig().getBoolean("can-auto-scale")) {
             this.worldName = BedWars.arenaManager.generateGameID();
         } else {
             this.worldName = arenaName;
         }
 
-        cm = arenaConfig;
+
 
         //if (mapManager.isLevelWorld()) {
         //    Main.plugin.getLogger().severe("COULD NOT LOAD ARENA: " + name);
@@ -1284,10 +1300,10 @@ public class Arena implements IArena {
         if (getStartingTask() != null) getStartingTask().cancel();
         if (getPlayingTask() != null) getPlayingTask().cancel();
         plugin.getLogger().log(Level.FINE, "Restarting arena: " + getArenaName());
-        Bukkit.getPluginManager().callEvent(new ArenaRestartEvent(getArenaName(), getWorldName()));
         for (Player inWorld : getWorld().getPlayers()) {
             inWorld.kickPlayer("You're not supposed to be here.");
         }
+        Bukkit.getPluginManager().callEvent(new ArenaRestartEvent(this, getArenaName(), getWorldName()));
         BedWars.getAPI().getRestoreAdapter().onRestart(this);
         destroyData();
     }
@@ -2450,54 +2466,61 @@ public class Arena implements IArena {
     }
 
     public void destroyData() {
-        destroyReJoins();
-        if (worldName != null) arenaByIdentifier.remove(worldName);
-        arenas.remove(this);
-        for (ReJoinTask rjt : ReJoinTask.getReJoinTasks()) {
-            if (rjt.getArena() == this) {
-                rjt.destroy();
+        try {
+            destroyReJoins();
+
+            if (worldName != null) arenaByIdentifier.remove(worldName);
+            arenas.remove(this);
+            for (ReJoinTask rjt : ReJoinTask.getReJoinTasks()) {
+                if (rjt.getArena() == this) {
+                    rjt.destroy();
+                }
             }
-        }
-        for (Despawnable despawnable : new ArrayList<>(BedWars.nms.getDespawnablesList().values())) {
-            if (despawnable.getTeam().getArena() == this) {
-                despawnable.destroy();
+            for (Despawnable despawnable : new ArrayList<>(BedWars.nms.getDespawnablesList().values())) {
+                if (despawnable.getTeam().getArena() == this) {
+                    despawnable.destroy();
+                }
             }
+            arenaByName.remove(arenaName);
+            arenaByPlayer.entrySet().removeIf(entry -> entry.getValue() == this);
+            players = null;
+            spectators = null;
+            signs = null;
+            yml = null;
+            cm = null;
+            world = null;
+
+            for (IGenerator og : oreGenerators) {
+                og.destroyData();
+            }
+            isOnABase.entrySet().removeIf(entry -> entry.getValue().getArena().equals(this));
+            for (ITeam bwt : teams) {
+                bwt.destroyData();
+            }
+            playerLocation.entrySet().removeIf(e -> Objects.requireNonNull(e.getValue().getWorld()).getName().equalsIgnoreCase(worldName));
+            teams = null;
+            placed = null;
+            nextEvents = null;
+            regionsList = null;
+            respawnSessions = null;
+            showTime = null;
+            playerKills = null;
+            playerBedsDestroyed = null;
+            playerFinalKills = null;
+            playerDeaths = null;
+            playerFinalKillDeaths = null;
+            startingTask = null;
+            playingTask = null;
+            restartingTask = null;
+            oreGenerators = null;
+            perMinuteTask = null;
+            moneyperMinuteTask = null;
+            leaving.clear();
+            fireballCooldowns.clear();
         }
-        arenaByName.remove(arenaName);
-        arenaByPlayer.entrySet().removeIf(entry -> entry.getValue() == this);
-        players = null;
-        spectators = null;
-        signs = null;
-        yml = null;
-        cm = null;
-        world = null;
-        for (IGenerator og : oreGenerators) {
-            og.destroyData();
+        catch (Exception e){
+            BedWars.debug("Arena Already Null");
         }
-        isOnABase.entrySet().removeIf(entry -> entry.getValue().getArena().equals(this));
-        for (ITeam bwt : teams) {
-            bwt.destroyData();
-        }
-        playerLocation.entrySet().removeIf(e -> Objects.requireNonNull(e.getValue().getWorld()).getName().equalsIgnoreCase(worldName));
-        teams = null;
-        placed = null;
-        nextEvents = null;
-        regionsList = null;
-        respawnSessions = null;
-        showTime = null;
-        playerKills = null;
-        playerBedsDestroyed = null;
-        playerFinalKills = null;
-        playerDeaths = null;
-        playerFinalKillDeaths = null;
-        startingTask = null;
-        playingTask = null;
-        restartingTask = null;
-        oreGenerators = null;
-        perMinuteTask = null;
-        moneyperMinuteTask = null;
-        leaving.clear();
-        fireballCooldowns.clear();
     }
 
     /**
@@ -2612,8 +2635,8 @@ public class Arena implements IArena {
 
     // used for auto scale conditions
     public static boolean canAutoScale(String arenaName) {
-        if (!autoscale) return true;
-
+//        if (!autoscale) return true;
+        if(!BedWars.getAPI().getConfigs().getMainConfig().getBoolean("auto-scale")) return false;
         if (Arena.getArenas().isEmpty()) return true;
 
         for (IArena ar : Arena.getEnableQueue()) {
@@ -2624,6 +2647,7 @@ public class Arena implements IArena {
 
         int activeClones = 0;
         for (IArena ar : Arena.getArenas()) {
+            if(!ar.getConfig().getBoolean("can-auto-scale"))return false;
             if (ar.getArenaName().equalsIgnoreCase(arenaName)) {
                 // clone this arena only if there aren't available arena of the same kind
                 if (ar.getStatus() == GameState.waiting || ar.getStatus() == GameState.starting) return false;
@@ -2711,6 +2735,14 @@ public class Arena implements IArena {
     @Override
     public List<Player> getLeavingPlayers() {
         return leaving;
+    }
+
+    public void showInGui(boolean b){
+        this.showInGUI = b;
+    }
+
+    public boolean isShownInGui(){
+        return this.showInGUI;
     }
 
     /**

@@ -71,7 +71,7 @@ public class ArenaGUI {
         }
 
         arenas = Arena.getSorted(arenas);
-
+        arenas.removeIf(n -> (!n.isShownInGui()));
         int arenaKey = 0;
         for (Integer slot : getUsedSlots()) {
             ItemStack i;

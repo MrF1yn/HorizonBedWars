@@ -40,6 +40,7 @@ public class PlayerStats {
     private int bedsDestroyed;
     private int gamesPlayed;
     private int winStreak;
+    private int highestWinStreak;
 
     public PlayerStats(UUID uuid) {
         this.uuid = uuid;
@@ -55,6 +56,14 @@ public class PlayerStats {
 
     public void setWinStreak(int winStreak) {
         this.winStreak = winStreak;
+    }
+
+    public void setHighestWinStreak(int winStreak) {
+        this.highestWinStreak = winStreak;
+    }
+
+    public int getHighestWinStreak() {
+        return this.highestWinStreak;
     }
 
     public void setName(String name) {

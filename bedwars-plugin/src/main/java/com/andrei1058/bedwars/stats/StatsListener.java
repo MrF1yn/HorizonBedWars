@@ -114,6 +114,8 @@ public class StatsListener implements Listener {
             // the ones who abandoned are already removed from the winners list
             stats.setWins(stats.getWins() + 1);
             stats.setWinStreak(stats.getWinStreak() + 1); //store win streaks
+            if(stats.getHighestWinStreak()<stats.getWinStreak())
+                stats.setHighestWinStreak(stats.getWinStreak());
 
             // store games played
             // give if he remained in this arena till the end even if was eliminated

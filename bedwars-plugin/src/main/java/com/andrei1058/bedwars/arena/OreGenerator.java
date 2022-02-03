@@ -58,6 +58,7 @@ public class OreGenerator implements IGenerator {
     private int rotate = 0, dropID = 0;
     private ITeam bwt;
     boolean up = true;
+    private boolean disabled;
 
     /**
      * Generator holograms per language <iso, holo></iso,>
@@ -80,7 +81,7 @@ public class OreGenerator implements IGenerator {
         this.type = type;
         loadDefaults();
         BedWars.debug("Initializing new generator at: " + location.toString() + " - " + type + " - " + (bwt == null ? "NOTEAM" : bwt.getName()));
-
+        disabled = false;
         Cuboid c = new Cuboid(location, 1, true);
         c.setMaxY(c.getMaxY() + 5);
         c.setMinY(c.getMinY() - 2);
@@ -160,10 +161,12 @@ public class OreGenerator implements IGenerator {
                 lastSpawn = delay;
             }
             if (bwt == null) {
+                if(!disabled)
                 dropItem(location);
                 return;
             }
             if (bwt.getMembers().size() == 1) {
+                if(!disabled)
                 dropItem(location);
                 return;
             }
@@ -171,6 +174,7 @@ public class OreGenerator implements IGenerator {
                 Object[] players = location.getWorld().getNearbyEntities(location, 1, 1, 1).stream().filter(entity -> entity.getType() == EntityType.PLAYER)
                         .filter(entity -> arena.isPlayer((Player) entity)).toArray();
                 if (players.length <= 1) {
+                    if(!disabled)
                     dropItem(location);
                     return;
                 }
@@ -181,11 +185,13 @@ public class OreGenerator implements IGenerator {
                     player.playSound(player.getLocation(), Sound.valueOf(BedWars.getForCurrentVersion("ITEM_PICKUP", "ENTITY_ITEM_PICKUP", "ENTITY_ITEM_PICKUP")), 0.6f, 1.3f);
                     Collection<ItemStack> excess = player.getInventory().addItem(item).values();
                     for (ItemStack value : excess) {
+                        if(!disabled)
                         dropItem(player.getLocation(), value.getAmount());
                     }
                 }
                 return;
             } else {
+                if(!disabled)
                 dropItem(location);
                 return;
             }
@@ -379,6 +385,7 @@ public class OreGenerator implements IGenerator {
                 a.destroy();
             }
         }
+        disabled = true;
         armorStands.clear();
     }
 

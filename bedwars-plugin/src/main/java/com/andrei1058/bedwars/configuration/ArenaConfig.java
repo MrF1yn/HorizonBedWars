@@ -45,6 +45,7 @@ public class ArenaConfig extends ConfigManager {
         yml.addDefault(ConfigPath.ARENA_UPGRADES_PROTECTION, 1);
         yml.addDefault(ConfigPath.ARENA_ISLAND_RADIUS, 17);
         yml.addDefault("worldBorder", 300);
+        yml.addDefault("can-auto-scale", false);
         yml.addDefault(ConfigPath.SHUFFLE_TEAMS, false);
         yml.addDefault(ConfigPath.UPDATE_STATS, true);
         yml.addDefault(ConfigPath.ARENA_Y_LEVEL_KILL, -1);

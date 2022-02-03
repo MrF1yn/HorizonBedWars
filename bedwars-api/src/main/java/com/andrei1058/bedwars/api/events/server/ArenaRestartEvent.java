@@ -20,6 +20,7 @@
 
 package com.andrei1058.bedwars.api.events.server;
 
+import com.andrei1058.bedwars.api.arena.IArena;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -27,13 +28,15 @@ public class ArenaRestartEvent extends Event {
     private static final HandlerList HANDLERS = new HandlerList();
 
     private String arena, worldName;
+    private IArena a;
 
     /**
      * Called when an arena is restarting.
      * After the world was unloaded.
      */
-    public ArenaRestartEvent(String arena, String worldName) {
+    public ArenaRestartEvent(IArena a, String arena, String worldName) {
         this.arena = arena;
+        this.a = a;
         this.worldName = worldName;
     }
 
@@ -42,6 +45,10 @@ public class ArenaRestartEvent extends Event {
      */
     public String getArenaName() {
         return arena;
+    }
+
+    public IArena getArena(){
+        return this.a;
     }
 
     @Override

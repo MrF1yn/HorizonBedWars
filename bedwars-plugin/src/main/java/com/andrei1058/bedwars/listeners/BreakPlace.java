@@ -92,7 +92,7 @@ public class BreakPlace implements Listener {
     public void onBurn(BlockBurnEvent event) {
         IArena arena = Arena.getArenaByIdentifier(event.getBlock().getWorld().getName());
         if (arena == null) return;
-        if (!arena.getConfig().getBoolean(ConfigPath.ARENA_ALLOW_MAP_BREAK)) {
+        if (!arena.isAllowMapBreak()) {
             event.setCancelled(true);
             return;
         }
@@ -161,7 +161,7 @@ public class BreakPlace implements Listener {
             // prevent modifying wood if protected
             // issue #531
             if (e.getBlockPlaced().getType().toString().contains("STRIPPED_") && e.getBlock().getType().toString().contains("_WOOD")) {
-                if (!a.getConfig().getBoolean(ConfigPath.ARENA_ALLOW_MAP_BREAK)) {
+                if (!a.isAllowMapBreak()) {
                     e.setCancelled(true);
                     return;
                 }
@@ -333,7 +333,7 @@ public class BreakPlace implements Listener {
                 }
             }
 
-            if (!a.getConfig().getBoolean(ConfigPath.ARENA_ALLOW_MAP_BREAK)) {
+            if (!a.isAllowMapBreak()) {
                 if (!a.isBlockPlaced(e.getBlock())) {
                     p.sendMessage(getMsg(p, Messages.INTERACT_CANNOT_BREAK_BLOCK));
                     e.setCancelled(true);

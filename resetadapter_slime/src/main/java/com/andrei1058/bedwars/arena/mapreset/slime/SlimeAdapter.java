@@ -127,6 +127,8 @@ public class SlimeAdapter extends RestoreAdapter {
 
     @Override
     public void onRestart(IArena a) {
+        if(a.getArenaName().contains("_private_"))
+            return;
         if (api.getServerType() == ServerType.BUNGEE) {
             if (api.getArenaUtil().getGamesBeforeRestart() == 0) {
                 if (api.getArenaUtil().getArenas().size() == 1 && api.getArenaUtil().getArenas().get(0).getStatus() == GameState.restarting) {

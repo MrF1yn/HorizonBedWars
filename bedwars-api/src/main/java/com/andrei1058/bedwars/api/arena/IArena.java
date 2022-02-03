@@ -43,7 +43,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface IArena {
-
+    void setAllowMapBreak(boolean allowMapBreak);
+    boolean isAllowMapBreak();
     /**
      * Check if a player is spectating on this arena.
      */
@@ -58,6 +59,13 @@ public interface IArena {
      * Check if a player is spectating on this arena.
      */
     boolean isReSpawning(UUID player);
+
+    /**
+     * Check if this arena can be shown in the arena selector gui.
+     */
+    boolean isShownInGui();
+
+    void showInGui(boolean b);
 
     /**
      * Get used world name.
@@ -79,6 +87,8 @@ public interface IArena {
      * Check if user is playing.
      */
     boolean isPlayer(Player player);
+
+
 
     /**
      * Get a list of spectators.

@@ -105,7 +105,8 @@ public class GameRestartingTask implements Runnable, RestartingTask {
                 }
             }
         } else if (restarting == 0) {
-            getArena().restart();
+            if (getArena() != null)
+                getArena().restart();
             task.cancel();
             arena = null;
         }

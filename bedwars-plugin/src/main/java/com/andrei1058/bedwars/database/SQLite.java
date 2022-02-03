@@ -78,7 +78,7 @@ public class SQLite implements Database {
             sql = "CREATE TABLE IF NOT EXISTS global_stats (id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "name VARCHAR(200), uuid VARCHAR(36), first_play TIMESTAMP NULL DEFAULT NULL, " +
                     "last_play TIMESTAMP DEFAULT NULL, wins INTEGER(10), kills INTEGER(10), " +
-                    "final_kills INTEGER(10), looses INTEGER(10), deaths INTEGER(10), final_deaths INTEGER(10), beds_destroyed INTEGER(10), games_played INTEGER(10), win_streak INTEGER(10) DEFAULT 0);";
+                    "final_kills INTEGER(10), looses INTEGER(10), deaths INTEGER(10), final_deaths INTEGER(10), beds_destroyed INTEGER(10), games_played INTEGER(10), win_streak INTEGER(10) DEFAULT 0, highest_win_streak INTEGER(10) DEFAULT 0);";
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate(sql);
             }
@@ -101,6 +101,10 @@ public class SQLite implements Database {
             }
             try (Statement st = connection.createStatement()) {
                 sql = "ALTER TABLE global_stats ADD COLUMN win_streak INTEGER(10) DEFAULT 0;";
+                st.executeUpdate(sql);
+            }
+            try (Statement st = connection.createStatement()) {
+                sql = "ALTER TABLE global_stats ADD COLUMN highest_win_streak INTEGER(10) DEFAULT 0;";
                 st.executeUpdate(sql);
             }
 
@@ -140,7 +144,7 @@ public class SQLite implements Database {
             checkConnection();
 
             if (hasStats(stats.getUuid())) {
-                sql = "UPDATE global_stats SET last_play=?, wins=?, kills=?, final_kills=?, looses=?, deaths=?, final_deaths=?, beds_destroyed=?, games_played=?, name=?, win_streak=? WHERE uuid = ?;";
+                sql = "UPDATE global_stats SET last_play=?, wins=?, kills=?, final_kills=?, looses=?, deaths=?, final_deaths=?, beds_destroyed=?, games_played=?, name=?, win_streak=?, highest_win_streak=? WHERE uuid = ?;";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setTimestamp(1, Timestamp.from(stats.getLastPlay()));
                     statement.setInt(2, stats.getWins());
@@ -153,11 +157,12 @@ public class SQLite implements Database {
                     statement.setInt(9, stats.getGamesPlayed());
                     statement.setString(10, stats.getName());
                     statement.setInt(11, stats.getWinStreak());//TODO:WINSTREAK
-                    statement.setString(12, stats.getUuid().toString());
+                    statement.setInt(12, stats.getHighestWinStreak());//TODO:WINSTREAK
+                    statement.setString(13, stats.getUuid().toString());
                     statement.executeUpdate();
                 }
             } else {
-                sql = "INSERT INTO global_stats (name, uuid, first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths, beds_destroyed, games_played, win_streak) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                sql = "INSERT INTO global_stats (name, uuid, first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths, beds_destroyed, games_played, win_streak, highest_win_streak) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setString(1, stats.getName());
                     statement.setString(2, stats.getUuid().toString());
@@ -172,6 +177,7 @@ public class SQLite implements Database {
                     statement.setInt(11, stats.getBedsDestroyed());
                     statement.setInt(12, stats.getGamesPlayed());
                     statement.setInt(13, stats.getWinStreak());//TODO:WINSTREAK
+                    statement.setInt(14, stats.getHighestWinStreak());//TODO:WINSTREAK
                     statement.executeUpdate();
                 }
             }
@@ -202,6 +208,7 @@ public class SQLite implements Database {
                         stats.setBedsDestroyed(result.getInt("beds_destroyed"));
                         stats.setGamesPlayed(result.getInt("games_played"));
                         stats.setWinStreak(result.getInt("win_streak"));
+                        stats.setHighestWinStreak(result.getInt("highest_win_streak"));
                     }
                 }
             }

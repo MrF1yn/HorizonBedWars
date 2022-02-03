@@ -23,6 +23,8 @@ package com.andrei1058.bedwars.lobbysocket;
 import com.andrei1058.bedwars.BedWars;
 import com.andrei1058.bedwars.api.arena.IArena;
 import com.andrei1058.bedwars.api.configuration.ConfigPath;
+import com.andrei1058.bedwars.api.events.player.PlayerJoinArenaEvent;
+import com.andrei1058.bedwars.api.events.server.LobbyMessageEvent;
 import com.andrei1058.bedwars.arena.Arena;
 import com.andrei1058.bedwars.arena.Misc;
 import com.google.gson.JsonObject;
@@ -127,15 +129,21 @@ public class ArenaSocket {
                         final JsonObject json;
                         try {
                             json = new JsonParser().parse(msg).getAsJsonObject();
+
                         } catch (JsonSyntaxException e) {
                             BedWars.plugin.getLogger().log(Level.WARNING, "Received bad data from: " + socket.getInetAddress().toString());
                             continue;
                         }
                         if (json == null) continue;
                         if (!json.has("type")) continue;
+                        Bukkit.getScheduler().runTask(BedWars.plugin, () -> {
+                            LobbyMessageEvent ev = new LobbyMessageEvent(json);
+                            Bukkit.getPluginManager().callEvent(ev);
+                        });
                         switch (json.get("type").getAsString().toUpperCase()) {
                             //pre load data
                             //pld,worldIdentifier,uuidUser,languageIso,uuidPartyOwner
+
                             case "PLD":
                                 new LoadedUser(json.get("uuid").getAsString(), json.get("arena_identifier").getAsString(), json.get("lang_iso").getAsString(), json.get("target").getAsString());
                                 break;
