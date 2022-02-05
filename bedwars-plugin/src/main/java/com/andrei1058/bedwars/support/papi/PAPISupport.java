@@ -29,6 +29,7 @@ import com.andrei1058.bedwars.api.language.Messages;
 import com.andrei1058.bedwars.arena.Arena;
 import com.andrei1058.bedwars.commands.shout.ShoutCommand;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -172,15 +173,32 @@ public class PAPISupport extends PlaceholderExpansion {
                 break;
             case "player_team":
                 if (a != null) {
-                    if (ShoutCommand.isShout(player)) {
-                        replay += Language.getMsg(player, Messages.FORMAT_PAPI_PLAYER_TEAM_SHOUT);
-                    }
+//                    if (ShoutCommand.isShout(player)) {
+//                        replay += Language.getMsg(player, Messages.FORMAT_PAPI_PLAYER_TEAM_SHOUT);
+//                    }
                     if (a.isPlayer(player)) {
                         if (a.getStatus() == GameState.playing) {
                             ITeam bwt = a.getTeam(player);
                             if (bwt != null) {
                                 replay += Language.getMsg(player, Messages.FORMAT_PAPI_PLAYER_TEAM_TEAM).replace("{TeamName}",
                                         bwt.getDisplayName(Language.getPlayerLanguage(player))).replace("{TeamColor}", String.valueOf(bwt.getColor().chat()));
+                            }
+                        }
+                    } else {
+                        replay += Language.getMsg(player, Messages.FORMAT_PAPI_PLAYER_TEAM_SPECTATOR);
+                    }
+                }
+                break;
+            case "player_team_single":
+                if (a != null) {
+//                    if (ShoutCommand.isShout(player)) {
+//                        replay += Language.getMsg(player, Messages.FORMAT_PAPI_PLAYER_TEAM_SHOUT);
+//                    }
+                    if (a.isPlayer(player)) {
+                        if (a.getStatus() == GameState.playing) {
+                            ITeam bwt = a.getTeam(player);
+                            if (bwt != null) {
+                                replay += bwt.getColor().chat()+""+ChatColor.BOLD+""+bwt.getColor().toString().charAt(0)+bwt.getColor().chat();
                             }
                         }
                     } else {

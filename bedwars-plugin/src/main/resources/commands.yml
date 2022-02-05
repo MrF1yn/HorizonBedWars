@@ -1,0 +1,3 @@
+LevelUp-Commands:
+ '100':
+    - 'hello'

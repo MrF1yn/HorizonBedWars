@@ -20,6 +20,7 @@
 
 package com.andrei1058.bedwars.arena;
 
+import addonFeatures.addonMethods;
 import com.andrei1058.bedwars.BedWars;
 import com.andrei1058.bedwars.api.arena.GameState;
 import com.andrei1058.bedwars.api.arena.IArena;
@@ -615,6 +616,7 @@ public class Arena implements IArena {
             p.setFlying(false);
             p.setAllowFlight(false);
             p.setHealth(20);
+            addonMethods.disableFly(p);
             for (Player on : players) {
                 on.sendMessage(getMsg(on, Messages.COMMAND_JOIN_PLAYER_JOIN_MSG).replace("{vPrefix}", getChatSupport().getPrefix(p)).replace("{playername}", p.getName()).replace("{player}", p.getDisplayName()).replace("{on}", String.valueOf(getPlayers().size())).replace("{max}", String.valueOf(getMaxPlayers())));
             }

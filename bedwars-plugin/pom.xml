@@ -198,6 +198,13 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>CMI9.0.4.6</groupId>
+            <artifactId>CMI9.0.4.6</artifactId>
+            <scope>system</scope>
+            <version>1.0</version>
+            <systemPath>H:\projectApisSpigot\CMI9.0.4.6.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>com.andrei1058.vipfeatures</groupId>
             <artifactId>vipfeatures-api</artifactId>
             <version>[1.0,)</version>

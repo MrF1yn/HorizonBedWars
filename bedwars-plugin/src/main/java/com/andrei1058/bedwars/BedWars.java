@@ -20,6 +20,7 @@
 
 package com.andrei1058.bedwars;
 
+import addonFeatures.addonListeners;
 import com.andrei1058.bedwars.api.arena.IArena;
 import com.andrei1058.bedwars.api.configuration.ConfigManager;
 import com.andrei1058.bedwars.api.configuration.ConfigPath;
@@ -83,6 +84,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -96,6 +100,7 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -191,6 +196,7 @@ public class BedWars extends JavaPlugin {
         }
     }
 
+
     @Override
     public void onEnable() {
         if (!serverSoftwareSupport) {
@@ -199,6 +205,8 @@ public class BedWars extends JavaPlugin {
         }
 
         nms.registerVersionListeners();
+        getServer().getPluginManager().registerEvents(new addonListeners(), this);
+
 
         if (Bukkit.getPluginManager().getPlugin("Enhanced-SlimeWorldManager") != null) {
             try {
@@ -574,6 +582,8 @@ public class BedWars extends JavaPlugin {
         HalloweenSpecial.init();
 
         SpoilPlayerTNTFeature.init();
+
+//        createCustomConfig();
     }
 
     public void onDisable() {
