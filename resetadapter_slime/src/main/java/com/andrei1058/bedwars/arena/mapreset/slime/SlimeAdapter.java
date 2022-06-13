@@ -156,6 +156,10 @@ public class SlimeAdapter extends RestoreAdapter {
 
     @Override
     public void onDisable(IArena a) {
+        if(api.isShuttingDown()) {
+            Bukkit.unloadWorld(a.getWorldName(), false);
+            return;
+        }
         Bukkit.getScheduler().runTask(getOwner(), () -> Bukkit.unloadWorld(a.getWorldName(), false));
     }
 

@@ -484,6 +484,8 @@ public interface BedWars {
      */
     ScoreboardUtil getScoreboardUtil();
 
+    boolean isShuttingDown();
+
     interface ScoreboardUtil {
 
         /**
